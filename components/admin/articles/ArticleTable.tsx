@@ -13,7 +13,7 @@ const statusMeta: Record<string, { label: string }> = {
 
 export interface RealArticle {
   id: number; title: string; slug: string; language: string; excerpt: string;
-  reading_time_minutes: number; status: string; views?: number; image?: string; 
+  reading_time_minutes: number; status: string; view_count?: number; image?: string; 
   category_name?: string; category_translation_id?: number; created_at: string;
 }
 
@@ -97,7 +97,7 @@ export default function ArticleTable({ loading, articles, transCats, onEdit, onD
                       </span>
                     </td>
                     <td className="px-6 py-4 font-bold text-white/50">{catName}</td>
-                    <td className="px-6 py-4 font-black text-white/70" dir="ltr">{toFa(a.views || 0)}</td>
+                    <td className="px-6 py-4 font-black text-white/70" dir="ltr">{toFa(a.view_count || 0)}</td>
                     <td className="px-6 py-4">
                       <span className={`inline-flex items-center gap-1.5 rounded-xl border px-2.5 py-1.5 text-[10px] font-black transition-all ${
                           a.status === "published" 

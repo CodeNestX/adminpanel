@@ -1,45 +1,30 @@
 import axios from "axios";
 
-// ۱. تنظیم آدرس پایه
-export const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:0050/api";
+// تشخیص محیط اجرا (سرور داکر یا مرورگر کاربر)
+const isServer = typeof window === "undefined";
 
-// ۲. ساخت یک نمونه (Instance) اختصاصی از آکسیوس
+// آدرس پایه هوشمند
+export const API_BASE_URL = isServer 
+  ? "http://backend:46329" 
+  : (process.env.NEXT_PUBLIC_API_URL || "http://localhost:46329");
+
+// ساخت نمونه آکسیوس
 const api = axios.create({
   baseURL: API_BASE_URL,
+  withCredentials: true, // الزامی برای ارسال کوکی در لاگین ادمین
 });
 
-// ۳. اینترسپتور درخواست: تزریق خودکار توکن به همه ریکوئست‌ها
-api.interceptors.request.use(
-  (config) => {
-    // گرفتن توکن از لوکال استوریج (فقط در محیط کلاینت)
-    if (typeof window !== "undefined") {
-      const token = localStorage.getItem("token");
-      if (token && config.headers) {
-        config.headers.Authorization = `Bearer ${token}`;
-      }
-    }
-    return config;
-  },
-  (error) => {
-    return Promise.reject(error);
-  }
-);
-
-// ۴. اینترسپتور پاسخ: مدیریت سراسری ارورها (مثل ارور 401 و 403)
+// اینترسپتور برای مدیریت ارورها و ریدایرکت ادمین
 api.interceptors.response.use(
   (response) => {
     return response;
   },
   (error) => {
-    // استخراج پیام ارور از سمت بک‌اند
     const message = error.response?.data?.message || "خطایی در ارتباط با سرور رخ داده است";
     
-    // مدیریت دسترسی غیرمجاز و توکن منقضی شده
-    if (error.response?.status === 401) {
-      if (typeof window !== "undefined") {
-        // اختیاری: می‌توانید در اینجا کاربر را اتوماتیک به صفحه لاگین بفرستید
-        // localStorage.removeItem("token");
-        // window.location.href = "/admin/login";
+    if (error.response?.status === 401 || error.response?.status === 403) {
+      if (!isServer) {
+        window.location.href = "/admin/login";
       }
     }
 
@@ -49,10 +34,7 @@ api.interceptors.response.use(
 
 export default api;
 
-// =========================================================================
-// Wrapper: تابع سازگارساز برای جلوگیری از خرابی سایر فایل‌های پروژه
-// این تابع دقیقاً شکل fetchApi قبلی را دارد اما مغز آن با Axios کار می‌کند
-// =========================================================================
+// تابع Wrapper برای سازگاری با سایر فایل‌های API ادمین
 export async function fetchApi(endpoint: string, options: any = {}) {
   try {
     const isFormData = typeof FormData !== "undefined" && options.body instanceof FormData;
@@ -60,19 +42,15 @@ export async function fetchApi(endpoint: string, options: any = {}) {
     const response = await api({
       url: endpoint,
       method: options.method || "GET",
-      // در آکسیوس از data به جای body استفاده می‌شود
       data: options.body, 
       headers: {
         ...options.headers,
-        // اگر دیتا FormData نباشد، هدر پیش‌فرض JSON قرار می‌گیرد
         ...(!isFormData && { "Content-Type": "application/json" }),
       },
     });
 
-    // آکسیوس خودش JSON را پارس می‌کند، نیازی به response.json() نیست
     return response.data; 
   } catch (error: any) {
-    // پرتاب ارور برای هندل شدن در کامپوننت‌ها (با پیامی که اینترسپتور ساخته است)
     throw error;
   }
 }
