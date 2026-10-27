@@ -1,0 +1,228 @@
+@import "tailwindcss";
+
+:root {
+  --background: #050b11;
+  --foreground: #ffffff;
+
+  --card: #0b1722;
+  --card-light: #101f2d;
+
+  --green: #39f77b;
+  --green-dark: #18c85a;
+
+  --blue: #00c8ff;
+
+  --muted: #91a0ad;
+  --border: rgba(255, 255, 255, 0.08);
+
+  color-scheme: dark;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  margin: 0;
+  background: var(--background);
+  color: var(--foreground);
+  font-family: var(--font-vazirmatn), sans-serif;
+}
+
+button,
+a {
+  font-family: inherit;
+}
+
+/* Auth inputs must stay dark even with browser autofill.
+   Chrome paints :-webkit-autofill with a white/yellow background by default. */
+input.auth-input,
+input.auth-input-admin {
+  color-scheme: dark;
+}
+
+input.auth-input:-webkit-autofill,
+input.auth-input:-webkit-autofill:hover,
+input.auth-input:-webkit-autofill:focus,
+input.auth-input:-webkit-autofill:active {
+  -webkit-text-fill-color: #ffffff;
+  -webkit-box-shadow: 0 0 0 1000px #050c11 inset;
+  box-shadow: 0 0 0 1000px #050c11 inset;
+  transition: background-color 9999s ease-in-out 0s;
+}
+
+input.auth-input-admin:-webkit-autofill,
+input.auth-input-admin:-webkit-autofill:hover,
+input.auth-input-admin:-webkit-autofill:focus,
+input.auth-input-admin:-webkit-autofill:active {
+  -webkit-text-fill-color: #ffffff;
+  -webkit-box-shadow: 0 0 0 1000px #020a0e inset;
+  box-shadow: 0 0 0 1000px #020a0e inset;
+  transition: background-color 9999s ease-in-out 0s;
+}
+
+::selection {
+  background: var(--green);
+  color: #041009;
+}
+
+/* Scrollbar */
+
+::-webkit-scrollbar {
+  width: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: #071019;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #1f394b;
+  border-radius: 999px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--green);
+}
+
+/* Container */
+
+.site-container {
+  width: min(1240px, calc(100% - 40px));
+  margin-inline: auto;
+}
+
+/* Green glow */
+
+.green-glow {
+  box-shadow:
+    0 0 30px rgba(57, 247, 123, 0.08),
+    inset 0 0 30px rgba(57, 247, 123, 0.02);
+}
+
+/* Card */
+
+.ev-card {
+  background: linear-gradient(
+    145deg,
+    rgba(16, 31, 45, 0.96),
+    rgba(7, 18, 28, 0.96)
+  );
+
+  border: 1px solid var(--border);
+  transition:
+    transform 0.3s ease,
+    border-color 0.3s ease,
+    box-shadow 0.3s ease;
+}
+
+.ev-card:hover {
+  transform: translateY(-5px);
+  border-color: rgba(57, 247, 123, 0.3);
+  box-shadow: 0 15px 40px rgba(0, 0, 0, 0.25);
+}
+
+/* Section */
+
+.section-space {
+  padding-block: 75px;
+}
+
+/* Hero image */
+
+.hero-image {
+  background-position: center;
+  background-size: cover;
+  background-repeat: no-repeat;
+}
+
+/* Mobile */
+
+@media (max-width: 768px) {
+  .site-container {
+    width: min(100% - 28px, 1240px);
+  }
+
+  .section-space {
+    padding-block: 55px;
+  }
+}
+
+/* ================================
+   ElectroCar Responsive Improvements
+================================ */
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  overflow-x: hidden;
+}
+
+/* Mobile */
+@media (max-width: 639px) {
+  .site-container {
+    width: 100%;
+    padding-left: 18px;
+    padding-right: 18px;
+  }
+
+  .section-space {
+    padding-top: 56px;
+    padding-bottom: 56px;
+  }
+
+  h1 {
+    text-wrap: balance;
+  }
+
+  h2,
+  h3 {
+    text-wrap: balance;
+  }
+}
+
+/* Small tablets */
+@media (min-width: 640px) and (max-width: 767px) {
+  .site-container {
+    padding-left: 24px;
+    padding-right: 24px;
+  }
+}
+
+/* Mobile text centering */
+@media (max-width: 767px) {
+  .mobile-center {
+    text-align: center;
+  }
+
+  .mobile-center-flex {
+    justify-content: center;
+  }
+
+  .mobile-center-items {
+    align-items: center;
+  }
+}
+
+/* Better touch experience */
+@media (max-width: 1023px) {
+  button,
+  a {
+    -webkit-tap-highlight-color: transparent;
+  }
+}
+
+/* Prevent horizontal overflow from cards/grids */
+img {
+  max-width: 100%;
+}
+
+* {
+  min-width: 0;
+}
