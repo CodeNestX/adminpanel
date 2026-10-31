@@ -12,8 +12,7 @@ export interface ArticleForm {
   subId: string; 
   imageFile?: File | null;
   imageUrl: string;
-  coverCaption: string;
-  coverAlt: string;    
+  coverAlt: string;    // فقط آلت برای کاور
   excerpt: string;
   status: string;
   readingTime: string | number;
@@ -67,7 +66,6 @@ export default function ArticleFormModal({
         </div>
 
         <div className="flex-1 space-y-6 overflow-y-auto px-6 py-5">
-          {/* بخش زبان و دسته‌بندی‌ها */}
           <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
             <div>
               <label className="mb-1.5 block text-[11px] font-bold text-white/60">زبان مقاله *</label>
@@ -84,7 +82,6 @@ export default function ArticleFormModal({
                 <option value="en">انگلیسی</option>
               </select>
             </div>
-
             <div>
               <label className="mb-1.5 block text-[11px] font-bold text-white/60">دسته‌بندی والد *</label>
               <select
@@ -102,7 +99,6 @@ export default function ArticleFormModal({
                 {baseCats.length === 0 && <option value="">بدون والد</option>}
               </select>
             </div>
-
             <div>
               <label className="mb-1.5 block text-[11px] font-bold text-white/60">دسته‌بندی فرعی *</label>
               <select
@@ -120,31 +116,25 @@ export default function ArticleFormModal({
             </div>
           </div>
 
-          {/* بخش عنوان مقاله */}
           <div>
-            <label className="mb-1.5 block text-[11px] font-bold text-white/60">
-              {form.lang === "fa" ? "عنوان مقاله *" : "Article title *"}
-            </label>
+            <label className="mb-1.5 block text-[11px] font-bold text-white/60">عنوان مقاله *</label>
             <input
               value={form.title}
               onChange={(e) => setForm({ ...form, title: e.target.value })}
-              placeholder={form.lang === "fa" ? "عنوان اصلی را وارد کنید..." : "Enter article title..."}
               dir={formDir}
-              className="w-full rounded-xl border border-white/10 bg-[#0b1722] px-4 py-2 text-sm text-white outline-none focus:border-[#00c8ff]/50"
+              className="w-full rounded-xl border border-white/10 bg-[#0b1722] px-4 py-2 text-sm text-white outline-none"
             />
           </div>
 
-          {/* بخش نامک و وضعیت */}
           <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
             <div>
-              <label className="mb-1.5 block text-[11px] font-bold text-white/60">نامک (Slug) - آدرس لاتین</label>
+              <label className="mb-1.5 block text-[11px] font-bold text-white/60">نامک (Slug)</label>
               <div className="flex gap-2">
                 <input
                   value={form.slug}
                   onChange={(e) => setForm({ ...form, slug: e.target.value })}
-                  placeholder="article-url-example"
                   dir="ltr"
-                  className="min-w-0 flex-1 rounded-xl border border-white/10 bg-[#0b1722] px-4 py-2 text-left text-sm text-white outline-none focus:border-[#00c8ff]/50"
+                  className="min-w-0 flex-1 rounded-xl border border-white/10 bg-[#0b1722] px-4 py-2 text-left text-sm text-white outline-none"
                 />
                 <button
                   type="button"
@@ -170,7 +160,6 @@ export default function ArticleFormModal({
             </div>
           </div>
 
-          {/* بخش عکس کاور و فیلدهای وابسته */}
           <div className="rounded-xl border border-white/5 bg-white/[0.01] p-4">
             <label className="mb-2 block text-[11px] font-bold text-white/60">عکس کاور مقاله</label>
             <input 
@@ -180,36 +169,25 @@ export default function ArticleFormModal({
                 const file = e.target.files?.[0];
                 if (file) setForm({ ...form, imageFile: file, imageUrl: URL.createObjectURL(file) });
               }}
-              className="w-full text-sm text-white/50 file:mr-4 file:rounded-lg file:border-0 file:bg-white/10 file:px-4 file:py-2 file:text-sm file:font-bold file:text-white hover:file:bg-white/20"
+              className="w-full text-sm text-white/50 file:mr-4 file:rounded-lg file:border-0 file:bg-white/10 file:px-4 file:py-2 file:text-sm file:font-bold file:text-white"
             />
             {form.imageUrl && (
               // eslint-disable-next-line @next/next/no-img-element
               <img src={form.imageUrl} alt="cover" className="mt-3 h-40 w-full rounded-xl object-cover" />
             )}
             
-            <div className="mt-4 grid grid-cols-1 gap-4 sm:grid-cols-2">
-              <div>
-                <label className="mb-1.5 block text-[11px] font-bold text-white/60">متن جایگزین کاور (Alt سئو) *</label>
-                <input
-                  value={form.coverAlt || ""}
-                  onChange={(e) => setForm({ ...form, coverAlt: e.target.value })}
-                  placeholder="توضیح عکس برای موتورهای جستجو..."
-                  className="w-full rounded-xl border border-white/10 bg-[#0b1722] px-4 py-2 text-xs text-white outline-none focus:border-[#00c8ff]/50"
-                />
-              </div>
-              <div>
-                <label className="mb-1.5 block text-[11px] font-bold text-white/60">کپشن کاور *</label>
-                <input
-                  value={form.coverCaption || ""}
-                  onChange={(e) => setForm({ ...form, coverCaption: e.target.value })}
-                  placeholder="متن نمایشی زیر عکس..."
-                  className="w-full rounded-xl border border-white/10 bg-[#0b1722] px-4 py-2 text-xs text-white outline-none focus:border-[#00c8ff]/50"
-                />
-              </div>
+            {/* فقط فیلد آلت برای کاور */}
+            <div className="mt-4">
+              <label className="mb-1.5 block text-[11px] font-bold text-white/60">متن جایگزین کاور (Alt سئو) *</label>
+              <input
+                value={form.coverAlt || ""}
+                onChange={(e) => setForm({ ...form, coverAlt: e.target.value })}
+                placeholder="توضیح عکس برای موتورهای جستجو..."
+                className="w-full rounded-xl border border-white/10 bg-[#0b1722] px-4 py-2 text-xs text-white outline-none"
+              />
             </div>
           </div>
 
-          {/* بخش زمان مطالعه */}
           <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
             <div>
               <label className="mb-1.5 block text-[11px] font-bold text-white/60">زمان مطالعه (دقیقه)</label>
@@ -217,26 +195,22 @@ export default function ArticleFormModal({
                 type="number"
                 value={form.readingTime}
                 onChange={(e) => setForm({ ...form, readingTime: e.target.value })}
-                placeholder="مثال: 5"
-                className="w-full rounded-xl border border-white/10 bg-[#0b1722] px-4 py-2 text-sm text-white outline-none focus:border-[#00c8ff]/50"
+                className="w-full rounded-xl border border-white/10 bg-[#0b1722] px-4 py-2 text-sm text-white outline-none"
               />
             </div>
           </div>
 
-          {/* بخش خلاصه مقاله */}
           <div>
             <label className="mb-1.5 block text-[11px] font-bold text-white/60">خلاصه مقاله (توضیحات کوتاه برای نمایش در لیست‌ها)</label>
             <textarea
               value={form.excerpt}
               onChange={(e) => setForm({ ...form, excerpt: e.target.value })}
-              placeholder="یک پاراگراف کوتاه در مورد مقاله بنویسید..."
               rows={3}
               dir={formDir}
-              className="w-full rounded-xl border border-white/10 bg-[#0b1722] px-4 py-2 text-sm leading-7 text-white outline-none focus:border-[#00c8ff]/50"
+              className="w-full rounded-xl border border-white/10 bg-[#0b1722] px-4 py-2 text-sm leading-7 text-white outline-none"
             />
           </div>
 
-          {/* بخش محتوای اصلی (ویرایشگر بلاک‌ها) */}
           <div dir={formDir} className="pt-2">
             <label className="mb-2 block text-sm font-bold text-white">محتوای اصلی مقاله</label>
             <BlockEditor 
@@ -249,22 +223,23 @@ export default function ArticleFormModal({
           </div>
         </div>
 
+        {/* اضافه شدن دکمه انصراف به صورت کاملاً واضح */}
         <div className="border-t border-white/5 px-6 py-4 bg-[#071018]">
           <div className="flex items-center gap-3">
+            <button
+              type="button"
+              onClick={onClose}
+              disabled={isBusy}
+              className="rounded-xl border border-white/10 bg-[#0b1722] px-8 py-3 text-sm font-bold text-white/70 transition-all hover:bg-white/5 hover:text-white disabled:opacity-50"
+            >
+              انصراف
+            </button>
             <button
               type="submit"
               disabled={isBusy}
               className="flex-1 rounded-xl bg-[#00c8ff] py-3 text-sm font-bold text-[#050b11] transition hover:brightness-110 disabled:opacity-50"
             >
               {isBusy ? "در حال ذخیره‌سازی..." : "ذخیره مقاله"}
-            </button>
-            <button
-              type="button"
-              onClick={onClose}
-              disabled={isBusy}
-              className="rounded-xl border border-white/10 bg-[#0b1722] px-6 py-3 text-sm font-bold text-white/70 transition-all hover:bg-white/5 hover:text-white disabled:opacity-50"
-            >
-              انصراف
             </button>
           </div>
           {formError && (
