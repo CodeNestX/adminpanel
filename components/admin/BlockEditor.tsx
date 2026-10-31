@@ -24,7 +24,6 @@ import Underline from "@tiptap/extension-underline";
 import { TextStyle } from "@tiptap/extension-text-style";
 import Color from "@tiptap/extension-color";
 
-// گرفتن تایپ‌ها و تنظیمات از فایل مرجع
 import { BlockType, ArticleBlock, blockMeta } from "@/lib/articleBlocks";
 
 const addOrder: BlockType[] = ["heading", "paragraph", "image", "quote", "list", "embed"];
@@ -38,7 +37,6 @@ function move(blocks: ArticleBlock[], id: string, dir: -1 | 1): ArticleBlock[] {
   return next;
 }
 
-// --- کامپوننت داخلی Tiptap ---
 const TiptapEditor = ({
   content,
   onChange,
@@ -77,7 +75,7 @@ const TiptapEditor = ({
   const setLink = useCallback(() => {
     if (!editor) return;
     const previousUrl = editor.getAttributes("link").href;
-    const url = window.prompt("لینک را وارد کنید:", previousUrl);
+    const url = window.prompt("آدرس لینک جدید را وارد کنید:", previousUrl);
     if (url === null) return;
     if (url === "") {
       editor.chain().focus().extendMarkRange("link").unsetLink().run();
@@ -90,7 +88,6 @@ const TiptapEditor = ({
 
   return (
     <div className="rounded-xl border border-white/10 bg-white/[0.01] overflow-hidden focus-within:border-[#39f77b]/50 transition-colors">
-      {/* تولبار Tiptap */}
       <div className="flex flex-wrap items-center gap-1.5 border-b border-white/10 bg-[#0b1722] p-2">
         <button
           type="button"
@@ -159,7 +156,6 @@ const TiptapEditor = ({
         </label>
       </div>
 
-      {/* ناحیه تایپ */}
       <div className="p-3.5">
         {editor.isEmpty && (
           <div className="pointer-events-none absolute text-sm text-white/30">{placeholder}</div>
@@ -170,7 +166,6 @@ const TiptapEditor = ({
   );
 };
 
-// --- کامپوننت اصلی مدیریت بلوک‌ها ---
 export default function BlockEditor({
   blocks,
   onChange,
@@ -198,7 +193,6 @@ export default function BlockEditor({
     <div className="space-y-3">
       {blocks.map((b, i) => (
         <div key={b.id} className="rounded-2xl border border-white/10 bg-white/[0.02] p-3.5">
-          {/* هدر بلوک */}
           <div className="mb-3 flex flex-wrap items-center gap-2">
             <span className="rounded-lg bg-[#39f77b]/10 px-2 py-1 text-[10px] font-extrabold text-[#39f77b]">
               {i + 1} • {blockMeta[b.type].label}
@@ -242,7 +236,6 @@ export default function BlockEditor({
             </span>
           </div>
 
-          {/* محتوای بلوک */}
           {b.type === "image" ? (
             <div className="space-y-2.5">
               <input 
@@ -262,34 +255,34 @@ export default function BlockEditor({
                 <input
                   value={b.alt ?? ""}
                   onChange={(e) => set(b.id, { alt: e.target.value })}
-                  placeholder="متن جایگزین (Alt) برای سئو"
+                  placeholder="متن جایگزین (Alt) تصویر برای سئو"
                   className="w-full rounded-xl border border-white/10 bg-white/[0.03] px-3.5 py-2.5 text-xs text-white outline-none focus:border-[#39f77b]/50"
                 />
                 <input
                   value={b.caption ?? ""}
                   onChange={(e) => set(b.id, { caption: e.target.value })}
                   placeholder="توضیح زیر عکس (Caption)"
-                  className="w-full rounded-xl border border-white/10 bg-white/[0.03] px-3.5 py-2.5 text-xs text-white outline-none focus:border-[#39f77b]/50"
+                  className="w-full rounded-xl border border-white/10 bg-white/[0.03] px-3.5 py-2.5 text-xs text-white outline-none"
                 />
               </div>
             </div>
           ) : b.type === "embed" ? (
-             <div className="space-y-2.5">
-                <textarea
-                  value={b.text_content}
-                  onChange={(e) => set(b.id, { text_content: e.target.value })}
-                  placeholder='کد iframe آپارات یا یوتیوب را اینجا پیست کنید...'
-                  rows={4}
-                  dir="ltr"
-                  className="w-full resize-y rounded-xl border border-[#00c8ff]/30 bg-white/[0.02] px-3.5 py-2.5 text-left text-xs font-mono text-white/70 outline-none focus:border-[#00c8ff]"
+            <div className="space-y-2.5">
+              <textarea
+                value={b.text_content}
+                onChange={(e) => set(b.id, { text_content: e.target.value })}
+                placeholder='کد iframe ویدیو یا لینک را اینجا وارد کنید...'
+                rows={4}
+                dir="ltr"
+                className="w-full resize-y rounded-xl border border-[#00c8ff]/30 bg-white/[0.02] px-3.5 py-2.5 text-left text-xs font-mono text-white/70 outline-none focus:border-[#00c8ff]"
+              />
+              {b.text_content.includes("<iframe") && (
+                <div 
+                  className="aspect-video w-full rounded-xl overflow-hidden border border-white/10"
+                  dangerouslySetInnerHTML={{ __html: b.text_content }}
                 />
-                {b.text_content.includes("<iframe") && (
-                   <div 
-                      className="aspect-video w-full rounded-xl overflow-hidden border border-white/10"
-                      dangerouslySetInnerHTML={{ __html: b.text_content }}
-                   />
-                )}
-             </div>
+              )}
+            </div>
           ) : (
             <TiptapEditor
               content={b.text_content}
@@ -300,9 +293,8 @@ export default function BlockEditor({
         </div>
       ))}
 
-      {/* نوار دکمه‌های افزودن بلوک جدید */}
       <div className="rounded-2xl border border-dashed border-[#39f77b]/25 bg-[#39f77b]/[0.03] p-3.5">
-        <p className="mb-2.5 text-center text-[11px] font-bold text-white/40">افزودن بلوک جدید</p>
+        <p className="mb-2.5 text-center text-[11px] font-bold text-white/40">افزودن محتوا</p>
         <div className="flex flex-wrap justify-center gap-2">
           {addOrder.map((t) => (
             <button

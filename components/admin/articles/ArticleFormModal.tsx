@@ -15,7 +15,6 @@ import React from "react";
 import BlockEditor from "@/components/admin/BlockEditor";
 import { estimateReadingTime, slugify, ArticleBlock } from "@/lib/articleBlocks";
 
-// تایپ‌های مورد نیاز برای این کامپوننت
 export interface ArticleForm {
   title: string;
   slug: string;
@@ -63,7 +62,6 @@ export default function ArticleFormModal({
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 p-4 backdrop-blur-sm">
       <form onSubmit={onSubmit} className="ev-card flex max-h-[90vh] w-full max-w-4xl flex-col overflow-hidden rounded-2xl">
         
-        {/* هدر مدال */}
         <div className="flex items-center justify-between border-b border-white/5 px-6 py-4">
           <h2 className="text-base font-bold text-white">
             {isEditing ? "ویرایش مقاله" : "مقاله جدید"}
@@ -77,7 +75,6 @@ export default function ArticleFormModal({
           </button>
         </div>
 
-        {/* محتوای اسکرول‌شونده فرم */}
         <div className="flex-1 space-y-6 overflow-y-auto px-6 py-5">
           <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
             <select
@@ -205,7 +202,6 @@ export default function ArticleFormModal({
           </div>
         </div>
 
-        {/* فوتر مدال و دکمه ذخیره */}
         <div className="border-t border-white/5 px-6 py-4">
           <button
             type="submit"

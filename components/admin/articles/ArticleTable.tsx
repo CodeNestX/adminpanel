@@ -56,7 +56,6 @@ export default function ArticleTable({ loading, articles, transCats, onEdit, onD
             ) : articles.length === 0 ? (
               <tr>
                 <td colSpan={6}>
-                  {/* طراحی بسیار شیک برای زمانی که مقاله‌ای یافت نشد */}
                   <div className="flex flex-col items-center justify-center py-24 opacity-70">
                     <div className="mb-5 flex h-16 w-16 items-center justify-center rounded-full bg-white/[0.02] border border-white/5">
                         <svg className="h-8 w-8 text-white/20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
