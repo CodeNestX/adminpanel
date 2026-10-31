@@ -45,10 +45,6 @@ export default function DashboardPage() {
   
     getDailyViewsReport().then(res => {  
       if (res.data && Array.isArray(res.data)) {  
-        // -------------------------------------------------------------
-        // راه‌حل قطعی مشکل نمودار: 
-        // تبدیل date و count بک‌اند به label و value که نمودار نیاز دارد
-        // -------------------------------------------------------------
         const formattedData = res.data.map((item: any) => ({
           label: item.date,
           value: item.count
@@ -152,11 +148,15 @@ export default function DashboardPage() {
           <ul className="flex-1 space-y-3">  
             {recentArticles.map((a) => (  
               <li key={a.id} className="flex items-center gap-3 rounded-xl border border-white/5 bg-white/[0.02] p-2">  
-                <img src={a.image || "https://images.unsplash.com/photo-1593941707882-a5bba14938c7"} alt="" className="h-10 w-12 shrink-0 rounded-lg object-cover" />  
+                {/* شرطی کردن عکس بدون لینک پیش‌فرض */}
+                {a.image ? (
+                  <img src={a.image} alt="" className="h-10 w-12 shrink-0 rounded-lg object-cover" />
+                ) : (
+                  <div className="h-10 w-12 shrink-0 rounded-lg bg-black/20 border border-white/5" />
+                )}
                 <span className="min-w-0 flex-1">  
                   <span className="block truncate text-[11px] font-bold text-white">{a.title}</span>  
                   <span className="mt-1 block text-[9px] text-white/35">  
-                    {/* اصلاح نام view_count به views برای هماهنگی با بک‌اند */}
                     {a.status === "published" ? "منتشرشده" : "پیشنویس"} • {toFa(a.views || 0)} بازدید  
                   </span>  
                 </span>  

@@ -1,14 +1,3 @@
-/**
- * کامپوننت ArticleFormModal
- * این فایل وظیفه نمایش پاپ‌آپ (مدال) ایجاد و ویرایش مقالات را بر عهده دارد.
- * 
- * مسئولیت‌های اصلی:
- * ۱. مدیریت فرم اطلاعات پایه مقاله (عنوان، نامک، زبان، کاور، و وضعیت انتشار).
- * ۲. فیلتر و بارگذاری خودکار زیردسته‌ها بر اساس زبان و دسته‌بندی والدِ انتخاب‌شده.
- * ۳. یکپارچگی با ویرایشگر متن (BlockEditor) و محاسبه خودکار زمان مطالعه.
- * ۴. مدیریت اعتبارسنجی فرم و حالت‌های در حال پردازش (Loading/Busy) پیش از ارسال به سرور.
- */
-
 "use client";
 
 import React from "react";
@@ -23,6 +12,8 @@ export interface ArticleForm {
   subId: string; 
   imageFile?: File | null;
   imageUrl: string;
+  coverCaption: string;
+  coverAlt: string;    
   excerpt: string;
   status: string;
   readingTime: string | number;
@@ -76,86 +67,112 @@ export default function ArticleFormModal({
         </div>
 
         <div className="flex-1 space-y-6 overflow-y-auto px-6 py-5">
+          {/* بخش زبان و دسته‌بندی‌ها */}
           <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
-            <select
-              value={form.lang}
-              onChange={(e) => {
-                const lang = e.target.value as "fa" | "en";
-                const subs = getSubs(form.parentId, lang);
-                setForm({ ...form, lang, subId: subs[0]?.id ? String(subs[0].id) : "" });
-              }}
-              className="w-full rounded-xl border border-white/10 bg-[#0b1722] px-4 py-2 text-sm text-white outline-none"
-            >
-              <option value="fa">فارسی</option>
-              <option value="en">انگلیسی</option>
-            </select>
-
-            <select
-              value={form.parentId}
-              onChange={(e) => {
-                const parentId = e.target.value;
-                const subs = getSubs(parentId, form.lang);
-                setForm({ ...form, parentId, subId: subs[0]?.id ? String(subs[0].id) : "" });
-              }}
-              className="w-full rounded-xl border border-white/10 bg-[#0b1722] px-4 py-2 text-sm text-white outline-none"
-            >
-              {baseCats.map((p) => (
-                <option key={p.id} value={p.id}>والد: {p.name}</option>
-              ))}
-              {baseCats.length === 0 && <option value="">بدون والد</option>}
-            </select>
-
-            <select
-              value={form.subId}
-              onChange={(e) => setForm({ ...form, subId: e.target.value })}
-              className="w-full rounded-xl border border-white/10 bg-[#0b1722] px-4 py-2 text-sm text-white outline-none"
-            >
-              {getSubs(form.parentId, form.lang).map((s) => (
-                <option key={s.id} value={s.id}>{s.name}</option>
-              ))}
-              {getSubs(form.parentId, form.lang).length === 0 && (
-                <option value="">— ترجمه‌ای ثبت نشده —</option>
-              )}
-            </select>
-          </div>
-
-          <input
-            value={form.title}
-            onChange={(e) => setForm({ ...form, title: e.target.value })}
-            placeholder={form.lang === "fa" ? "عنوان مقاله *" : "Article title *"}
-            dir={formDir}
-            className="w-full rounded-xl border border-white/10 bg-[#0b1722] px-4 py-2 text-sm text-white outline-none focus:border-[#00c8ff]/50"
-          />
-
-          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-            <div className="flex gap-2">
-              <input
-                value={form.slug}
-                onChange={(e) => setForm({ ...form, slug: e.target.value })}
-                placeholder="نامک (slug)"
-                dir="ltr"
-                className="min-w-0 flex-1 rounded-xl border border-white/10 bg-[#0b1722] px-4 py-2 text-left text-sm text-white outline-none focus:border-[#00c8ff]/50"
-              />
-              <button
-                type="button"
-                onClick={() => setForm({ ...form, slug: slugify(form.title || `article-${Date.now()}`) })}
-                className="shrink-0 rounded-xl border border-white/10 px-3 py-2 text-xs font-bold text-white/60 hover:text-white"
+            <div>
+              <label className="mb-1.5 block text-[11px] font-bold text-white/60">زبان مقاله *</label>
+              <select
+                value={form.lang}
+                onChange={(e) => {
+                  const lang = e.target.value as "fa" | "en";
+                  const subs = getSubs(form.parentId, lang);
+                  setForm({ ...form, lang, subId: subs[0]?.id ? String(subs[0].id) : "" });
+                }}
+                className="w-full rounded-xl border border-white/10 bg-[#0b1722] px-4 py-2 text-sm text-white outline-none"
               >
-                خودکار
-              </button>
+                <option value="fa">فارسی</option>
+                <option value="en">انگلیسی</option>
+              </select>
             </div>
-            <select
-              value={form.status}
-              onChange={(e) => setForm({ ...form, status: e.target.value })}
-              className="w-full rounded-xl border border-white/10 bg-[#0b1722] px-4 py-2 text-sm text-white outline-none"
-            >
-              <option value="published">منتشرشده</option>
-              <option value="draft">پیش‌نویس</option>
-              <option value="archived">آرشیو</option>
-            </select>
+
+            <div>
+              <label className="mb-1.5 block text-[11px] font-bold text-white/60">دسته‌بندی والد *</label>
+              <select
+                value={form.parentId}
+                onChange={(e) => {
+                  const parentId = e.target.value;
+                  const subs = getSubs(parentId, form.lang);
+                  setForm({ ...form, parentId, subId: subs[0]?.id ? String(subs[0].id) : "" });
+                }}
+                className="w-full rounded-xl border border-white/10 bg-[#0b1722] px-4 py-2 text-sm text-white outline-none"
+              >
+                {baseCats.map((p) => (
+                  <option key={p.id} value={p.id}>والد: {p.name}</option>
+                ))}
+                {baseCats.length === 0 && <option value="">بدون والد</option>}
+              </select>
+            </div>
+
+            <div>
+              <label className="mb-1.5 block text-[11px] font-bold text-white/60">دسته‌بندی فرعی *</label>
+              <select
+                value={form.subId}
+                onChange={(e) => setForm({ ...form, subId: e.target.value })}
+                className="w-full rounded-xl border border-white/10 bg-[#0b1722] px-4 py-2 text-sm text-white outline-none"
+              >
+                {getSubs(form.parentId, form.lang).map((s) => (
+                  <option key={s.id} value={s.id}>{s.name}</option>
+                ))}
+                {getSubs(form.parentId, form.lang).length === 0 && (
+                  <option value="">— ترجمه‌ای ثبت نشده —</option>
+                )}
+              </select>
+            </div>
           </div>
 
+          {/* بخش عنوان مقاله */}
           <div>
+            <label className="mb-1.5 block text-[11px] font-bold text-white/60">
+              {form.lang === "fa" ? "عنوان مقاله *" : "Article title *"}
+            </label>
+            <input
+              value={form.title}
+              onChange={(e) => setForm({ ...form, title: e.target.value })}
+              placeholder={form.lang === "fa" ? "عنوان اصلی را وارد کنید..." : "Enter article title..."}
+              dir={formDir}
+              className="w-full rounded-xl border border-white/10 bg-[#0b1722] px-4 py-2 text-sm text-white outline-none focus:border-[#00c8ff]/50"
+            />
+          </div>
+
+          {/* بخش نامک و وضعیت */}
+          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+            <div>
+              <label className="mb-1.5 block text-[11px] font-bold text-white/60">نامک (Slug) - آدرس لاتین</label>
+              <div className="flex gap-2">
+                <input
+                  value={form.slug}
+                  onChange={(e) => setForm({ ...form, slug: e.target.value })}
+                  placeholder="article-url-example"
+                  dir="ltr"
+                  className="min-w-0 flex-1 rounded-xl border border-white/10 bg-[#0b1722] px-4 py-2 text-left text-sm text-white outline-none focus:border-[#00c8ff]/50"
+                />
+                <button
+                  type="button"
+                  onClick={() => setForm({ ...form, slug: slugify(form.title || `article-${Date.now()}`) })}
+                  className="shrink-0 rounded-xl border border-white/10 px-3 py-2 text-xs font-bold text-white/60 hover:text-white"
+                >
+                  خودکار
+                </button>
+              </div>
+            </div>
+            
+            <div>
+              <label className="mb-1.5 block text-[11px] font-bold text-white/60">وضعیت انتشار *</label>
+              <select
+                value={form.status}
+                onChange={(e) => setForm({ ...form, status: e.target.value })}
+                className="w-full rounded-xl border border-white/10 bg-[#0b1722] px-4 py-2 text-sm text-white outline-none"
+              >
+                <option value="published">منتشرشده</option>
+                <option value="draft">پیش‌نویس</option>
+                <option value="archived">آرشیو</option>
+              </select>
+            </div>
+          </div>
+
+          {/* بخش عکس کاور و فیلدهای وابسته */}
+          <div className="rounded-xl border border-white/5 bg-white/[0.01] p-4">
+            <label className="mb-2 block text-[11px] font-bold text-white/60">عکس کاور مقاله</label>
             <input 
               type="file" 
               accept="image/*"
@@ -167,31 +184,61 @@ export default function ArticleFormModal({
             />
             {form.imageUrl && (
               // eslint-disable-next-line @next/next/no-img-element
-              <img src={form.imageUrl} alt="cover" className="mt-2 h-40 w-full rounded-xl object-cover" />
+              <img src={form.imageUrl} alt="cover" className="mt-3 h-40 w-full rounded-xl object-cover" />
             )}
+            
+            <div className="mt-4 grid grid-cols-1 gap-4 sm:grid-cols-2">
+              <div>
+                <label className="mb-1.5 block text-[11px] font-bold text-white/60">متن جایگزین کاور (Alt سئو) *</label>
+                <input
+                  value={form.coverAlt || ""}
+                  onChange={(e) => setForm({ ...form, coverAlt: e.target.value })}
+                  placeholder="توضیح عکس برای موتورهای جستجو..."
+                  className="w-full rounded-xl border border-white/10 bg-[#0b1722] px-4 py-2 text-xs text-white outline-none focus:border-[#00c8ff]/50"
+                />
+              </div>
+              <div>
+                <label className="mb-1.5 block text-[11px] font-bold text-white/60">کپشن کاور *</label>
+                <input
+                  value={form.coverCaption || ""}
+                  onChange={(e) => setForm({ ...form, coverCaption: e.target.value })}
+                  placeholder="متن نمایشی زیر عکس..."
+                  className="w-full rounded-xl border border-white/10 bg-[#0b1722] px-4 py-2 text-xs text-white outline-none focus:border-[#00c8ff]/50"
+                />
+              </div>
+            </div>
           </div>
 
+          {/* بخش زمان مطالعه */}
           <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-            <input
-              type="number"
-              value={form.readingTime}
-              onChange={(e) => setForm({ ...form, readingTime: e.target.value })}
-              placeholder="زمان مطالعه (دقیقه)"
-              className="w-full rounded-xl border border-white/10 bg-[#0b1722] px-4 py-2 text-sm text-white outline-none focus:border-[#00c8ff]/50"
+            <div>
+              <label className="mb-1.5 block text-[11px] font-bold text-white/60">زمان مطالعه (دقیقه)</label>
+              <input
+                type="number"
+                value={form.readingTime}
+                onChange={(e) => setForm({ ...form, readingTime: e.target.value })}
+                placeholder="مثال: 5"
+                className="w-full rounded-xl border border-white/10 bg-[#0b1722] px-4 py-2 text-sm text-white outline-none focus:border-[#00c8ff]/50"
+              />
+            </div>
+          </div>
+
+          {/* بخش خلاصه مقاله */}
+          <div>
+            <label className="mb-1.5 block text-[11px] font-bold text-white/60">خلاصه مقاله (توضیحات کوتاه برای نمایش در لیست‌ها)</label>
+            <textarea
+              value={form.excerpt}
+              onChange={(e) => setForm({ ...form, excerpt: e.target.value })}
+              placeholder="یک پاراگراف کوتاه در مورد مقاله بنویسید..."
+              rows={3}
+              dir={formDir}
+              className="w-full rounded-xl border border-white/10 bg-[#0b1722] px-4 py-2 text-sm leading-7 text-white outline-none focus:border-[#00c8ff]/50"
             />
           </div>
 
-          <textarea
-            value={form.excerpt}
-            onChange={(e) => setForm({ ...form, excerpt: e.target.value })}
-            placeholder="خلاصه مقاله (توضیحات کوتاه)"
-            rows={3}
-            dir={formDir}
-            className="w-full rounded-xl border border-white/10 bg-[#0b1722] px-4 py-2 text-sm leading-7 text-white outline-none focus:border-[#00c8ff]/50"
-          />
-
-          <div dir={formDir}>
-            <p className="mb-2 text-sm font-bold text-white">محتوای مقاله</p>
+          {/* بخش محتوای اصلی (ویرایشگر بلاک‌ها) */}
+          <div dir={formDir} className="pt-2">
+            <label className="mb-2 block text-sm font-bold text-white">محتوای اصلی مقاله</label>
             <BlockEditor 
               blocks={form.blocks} 
               onChange={(blocks) => {
@@ -202,14 +249,24 @@ export default function ArticleFormModal({
           </div>
         </div>
 
-        <div className="border-t border-white/5 px-6 py-4">
-          <button
-            type="submit"
-            disabled={isBusy}
-            className="w-full rounded-xl bg-[#00c8ff] py-3 text-sm font-bold text-[#050b11] transition hover:brightness-110 disabled:opacity-50"
-          >
-            {isBusy ? "در حال ذخیره‌سازی..." : "ذخیره مقاله"}
-          </button>
+        <div className="border-t border-white/5 px-6 py-4 bg-[#071018]">
+          <div className="flex items-center gap-3">
+            <button
+              type="submit"
+              disabled={isBusy}
+              className="flex-1 rounded-xl bg-[#00c8ff] py-3 text-sm font-bold text-[#050b11] transition hover:brightness-110 disabled:opacity-50"
+            >
+              {isBusy ? "در حال ذخیره‌سازی..." : "ذخیره مقاله"}
+            </button>
+            <button
+              type="button"
+              onClick={onClose}
+              disabled={isBusy}
+              className="rounded-xl border border-white/10 bg-[#0b1722] px-6 py-3 text-sm font-bold text-white/70 transition-all hover:bg-white/5 hover:text-white disabled:opacity-50"
+            >
+              انصراف
+            </button>
+          </div>
           {formError && (
             <p className="mt-3 text-center text-xs font-bold text-red-400">
               {formError}

@@ -3,8 +3,6 @@
 import React from "react";
 import { toFa } from "@/lib/fa";
 
-const FALLBACK_COVER = "https://images.unsplash.com/photo-1593941707882-a5bba14938c7?auto=format&fit=crop&w=1200&q=85";
-
 const statusMeta: Record<string, { label: string }> = {
   published: { label: "منتشر شده" },
   draft: { label: "پیش‌نویس" },
@@ -13,7 +11,7 @@ const statusMeta: Record<string, { label: string }> = {
 
 export interface RealArticle {
   id: number; title: string; slug: string; language: string; excerpt: string;
-  reading_time_minutes: number; status: string; view_count?: number; image?: string; 
+  reading_time_minutes: number; status: string; views?: number; image?: string; 
   category_name?: string; category_translation_id?: number; created_at: string;
 }
 
@@ -78,7 +76,10 @@ export default function ArticleTable({ loading, articles, transCats, onEdit, onD
                       <div className="flex items-center gap-4">
                         <div className="relative h-12 w-20 shrink-0 overflow-hidden rounded-xl border border-white/5 bg-[#050b11]">
                           <div className="absolute inset-0 z-10 bg-[#39f77b]/20 opacity-0 mix-blend-overlay transition-opacity duration-300 group-hover:opacity-100"></div>
-                          <img src={a.image || FALLBACK_COVER} alt="" className="h-full w-full object-cover transition-transform duration-700 group-hover:scale-110" />
+                          {/* فقط اگر عکس وجود داشت رندر می‌شود، در غیر این صورت پس‌زمینه تاریک می‌ماند */}
+                          {a.image && (
+                            <img src={a.image} alt="" className="h-full w-full object-cover transition-transform duration-700 group-hover:scale-110" />
+                          )}
                         </div>
                         <span className="min-w-0">
                           <span className="block max-w-[280px] truncate text-[13px] font-black text-white/90 transition-colors group-hover:text-white">
@@ -96,7 +97,7 @@ export default function ArticleTable({ loading, articles, transCats, onEdit, onD
                       </span>
                     </td>
                     <td className="px-6 py-4 font-bold text-white/50">{catName}</td>
-                    <td className="px-6 py-4 font-black text-white/70" dir="ltr">{toFa(a.view_count || 0)}</td>
+                    <td className="px-6 py-4 font-black text-white/70" dir="ltr">{toFa(a.views || 0)}</td>
                     <td className="px-6 py-4">
                       <span className={`inline-flex items-center gap-1.5 rounded-xl border px-2.5 py-1.5 text-[10px] font-black transition-all ${
                           a.status === "published" 
