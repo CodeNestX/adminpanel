@@ -24,7 +24,13 @@ api.interceptors.response.use(
     
     if (error.response?.status === 401 || error.response?.status === 403) {
       if (!isServer) {
-        window.location.href = "/admin/login";
+        // ۱. حل مشکل لوپ: پاک کردن سشن منقضی‌شده از مرورگر
+        localStorage.removeItem("admin_session");
+        
+        // ۲. بررسی مسیر: فقط اگر در صفحه لاگین نیستیم، ریدایرکت انجام شود
+        if (window.location.pathname !== "/admin/login") {
+          window.location.href = "/admin/login";
+        }
       }
     }
 

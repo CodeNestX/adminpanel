@@ -69,6 +69,6 @@ export const syncArticleBlocks = async (articleId: number | string, formData: Fo
 export const searchArticlesApi = async (query: string) => {
   return fetchApi("/articles/search", {
     method: "POST",
-    body: JSON.stringify({ query }), 
+    body: JSON.stringify({ prompt: query }), 
   });
 };
